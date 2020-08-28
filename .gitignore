@@ -1,4 +1,5 @@
 *.log
 *.exe
 *.pyc
+*.plt
 scripts/*
