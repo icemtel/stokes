@@ -3,3 +3,4 @@
 *.pyc
 *.plt
 scripts/*
+FBEM/example/data/*
