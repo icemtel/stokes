@@ -1,3 +1,6 @@
+'''
+Solve a system of a moving sphere and a no-slip wall
+'''
 import mesh
 import FBEM
 

@@ -3,4 +3,4 @@ numpy>=1.18
 scipy>=1.4
 h5py>=2.10
 triangle>=20170429
-mayavi>=4.6
+# mayavi>=4.6

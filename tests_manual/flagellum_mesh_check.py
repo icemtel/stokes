@@ -1,7 +1,9 @@
 '''
 Quick test functions in the file
+
 Observed:
 1. If points2=None, then we cannot run the meshing.
+
 2. If we have input points on x axis - from 0 to 10 with a step of 1, then
    Mesh will create points on circumferences at points x=0.5..9.5;
    then at 0 and 10 there will be only 1 point - flagella tips.
@@ -18,6 +20,7 @@ Conclusion from fbem_simulations/playground/create_flagellum_arbitrary_normal_ch
 import numpy as np
 import matplotlib.pyplot as plt
 from mesh.shapes.Flagellum import prepareFlagella
+
 radius = 0.1
 nTheta = 4
 a = np.array([1, 0, 0])

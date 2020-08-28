@@ -1,7 +1,6 @@
-import io
 import pandas as pd
-import myOS
-
+import os
+from FBEM.various import path_to_string, subdirs, Path
 
 class LogData:
     def __init__(self, info1, numIter, bePRE, beUNPRE, time_cpu, time_wall):
@@ -54,19 +53,19 @@ def _extract_data(file, dtype):
 def extract_data(folder, name='output.log', dtype=None):
     '''
     Read data from a log file in a folder.
-    A bit overengineered, but can give result in either class 'LogData', 'dict', 'tuple' and some others.
-    :param dtype: If None, returns LogData class istance.
+    Can give result in either class 'LogData', 'dict', 'tuple' and some others.
+    :param dtype: If None, returns logs data in LogData type.
     '''
-    filename = myOS.pathjoin(folder, name)
+    filename =os.path.join(folder, name)
     with open(filename, 'r') as file:
         return _extract_data(file, dtype)
 
 
 def extract_from_many_simple(parent_folder):
     subdir_log_dict = {}
-    for subdir in myOS.subdirs(parent_folder):
+    for subdir in subdirs(parent_folder):
         try:
-            folder = myOS.pathjoin(parent_folder, subdir)
+            folder =os.path.join(parent_folder, subdir)
             log_dict = extract_data(folder, dtype=dict)
         except (FileNotFoundError, UnboundLocalError):
             continue
@@ -81,9 +80,9 @@ def _extract_from_many_folders(parent_folder, max_depth=3, depth=1, rel_path="")
     Tf a subdirectory doesn't have correct log file, go recursively into subfolders up to max_depth
     '''
     data_dict = {}
-    for subdir in myOS.subdirs(parent_folder):
-        relative_path = myOS.pathjoin(rel_path, subdir)
-        folder = myOS.pathjoin(parent_folder, subdir)
+    for subdir in subdirs(parent_folder):
+        relative_path =os.path.join(rel_path, subdir)
+        folder =os.path.join(parent_folder, subdir)
         try:
             log_dict = extract_data(folder, dtype=dict)
             data_to_update = {str(relative_path): log_dict}
@@ -129,12 +128,12 @@ def extract_data_hdf5(group, name='log_raw', dtype=None):
 def _extract_from_many_hdf5(group, max_depth=3, depth=1, rel_path=""):
     '''
     Extract logs in subdolders of 'parent_folder',
-    Tf a subdirectory doesn't have correct log file, go recursively into subfolders up to max_depth
+    If a subdirectory does not have correct log file, go recursively into subfolders up to max_depth
     '''
-    import myh5 as myh5
+    import FBEM.myh5 as myh5
     data_dict = {}
     for key in myh5.subgroups_names(group):
-        relative_path = myOS.pathjoin(rel_path, key).as_posix()
+        relative_path = path_to_string(os.path.join(rel_path, key))
         try:
             log_dict = extract_data_hdf5(group[key], dtype=dict)
             data_to_update = {str(relative_path): log_dict}
@@ -157,8 +156,8 @@ def extract_from_many(path, max_depth, group=''):
     :param path: either folder or hdf5 filename
     :param group: group in hdf5 file; ignored if `path` is a folder
     '''
-    path = myOS.Path(path)
-    group = myOS.Path(group).as_posix()
+    path = Path(path)
+    group = path_to_string(group)
     if not path.exists():
         raise ValueError("Path doesn't point to a hdf5 file or a directory")
     if path.is_dir():

@@ -1,10 +1,12 @@
+import os
 from datetime import datetime
-
 import mesh.convert
-import myOS
-import FBEM_config as cfg
-import processing.csvs as csvs
+import FBEM.config as cfg
 from mesh import triangulate_system
+from FBEM.various import prepare_csv_line
+
+
+
 
 
 def write_input_to_file(filename, tria_generator, *tria_generator_args, description='',
@@ -24,7 +26,7 @@ def write_inputDat_to_folder(folder, system, external_flow_field=None):
     This function basically calls one function from Gary's code, assuming tria_generator = fuse_mesh.
     :return: Triangulation object
     '''
-    input_path = myOS.pathjoin(folder, 'input.dat')
+    input_path = os.path.join(folder, 'input.dat')
     triangulation = write_input_to_file(input_path, mesh.fuse_mesh, system, external_flow_field=external_flow_field)
     return triangulation
 
@@ -35,12 +37,12 @@ def write_ranges(filename, mesh):
     triangulation of a mesh (coordRanges, triaRanges).
     """
     with open(filename, 'w') as f:
-        header = csvs.prepare_line("name", "coords_start", "coords_end", "trias_start", "trias_end")
+        header = prepare_csv_line("name", "coords_start", "coords_end", "trias_start", "trias_end")
         f.write(header)
         for name in mesh.coordRanges:
             coords_start, coords_end = mesh.coordRanges[name]
             trias_start, trias_end = mesh.triaRanges[name]
-            line = csvs.prepare_line(name, coords_start, coords_end, trias_start, trias_end)
+            line = prepare_csv_line(name, coords_start, coords_end, trias_start, trias_end)
             f.write(line)
 
 
@@ -53,7 +55,7 @@ def write_input_and_ranges(folder, system, external_flow_field=None):
     system = prepare_system(system)
     meshGK = write_inputDat_to_folder(folder, system, external_flow_field)
 
-    remembery_path = myOS.pathjoin(folder, 'ranges.csv')
+    remembery_path = os.path.join(folder, 'ranges.csv')
     write_ranges(remembery_path, meshGK)
 
 
@@ -66,7 +68,7 @@ def write_input_cnd(folder, params=None, name='input.cnd'):
     params_dict = dict(cfg.default_values_dict)  # make a copy
     if params is not None:
         params_dict.update(params)  # Replace the default values with the given ones
-    with open(myOS.Path(folder, name), 'w') as cnd:
+    with open(os.path.join(folder, name), 'w') as cnd:
         # Write the first line
         for key in ['eps', 'maxl', 'kmp', 'jscal', 'jpre', 'nrmax', 'tol']:
             val = params_dict[key]

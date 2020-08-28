@@ -1,10 +1,9 @@
-import scipy as sp
+import numpy as np
 import scipy.linalg as lin
 import h5py
-import importlib.util as imp_util  # import importlib as implib
-import myOS
-
-import calc.extract_results as extract
+import pandas as pd
+import os
+from FBEM.various import path_to_string, Path
 
 
 # Read input file
@@ -12,7 +11,7 @@ def read_tolerance(folder):
     '''
     read the 7nth thing from a line, replace D with E (e.g. in "0.1D-1"), transform to a float
     '''
-    with open(myOS.pathjoin(folder, "input.cnd"), 'r') as file:
+    with open(os.path.join(folder, "input.cnd"), 'r') as file:
         line = file.readline()
         line_list = line.split()
         tol_str = line_list[6]
@@ -25,13 +24,25 @@ def read_viscosity(folder, infile="input.dat"):
     '''
     Skip two lines, read the third thing from the line, transform to a float.
     '''
-    with open(myOS.pathjoin(folder, infile), 'r') as file:
+    with open(os.path.join(folder, infile), 'r') as file:
         file.readline()
         file.readline()
         line = file.readline()
         line_list = line.split()
         visc_str = line_list[2]  # read tolerance from the correct position
         return float(visc_str)
+
+
+# Calculate physical quantities
+def calc_flowfield(coordinates, forces, visc=1):
+    coordinates = np.array(coordinates)
+    const = 1 / 8 / np.pi / visc
+    def hfunc(r):
+        dr = r - coordinates
+        ndr = np.linalg.norm(dr, axis=1)
+        fdr = np.array(np.sum(forces * dr, axis=1))
+        return  np.sum(np.transpose((np.transpose(np.transpose(dr) * fdr / (ndr * ndr)) + forces)) * const / ndr, axis=1)
+    return hfunc
 
 
 # Read output file
@@ -45,55 +56,19 @@ class ResultsData:
         self.areas = areas  # element areas; were only needed to calculate forces, but it doesn't hurt to keep it anyway
 
     def extract_force(self):
-        return extract.force(self.forces)
+        return np.sum(self.forces, axis=0)
 
     def extract_center(self):
-        return extract.center(self.coordinates)
+        return np.mean(self.coordinates, axis=0)
 
-    def extract_centertorque(self):
-        return extract.centertorque(self.coordinates, self.forces)
-
-    def extract_torque(self, origin):
-        return extract.torque(origin, self.coordinates, self.forces)
+    def extract_torque(self, origin=None):
+        if origin is None:
+            origin = self.extract_center()
+        return np.sum(np.cross(self.coordinates - origin, self.forces), axis=0)
 
     def extract_flowfield(self):
-        return extract.flowfield(self.coordinates, self.forces, self.visc)
+        return calc_flowfield(self.coordinates, self.forces, self.visc)
 
-
-# Returns Dictionary!
-# def triangulation(filename, posiRange, triaRange):
-#     """
-#     filename is the name of the input file.
-#     """
-#     tria = {}
-#     posi = {}
-#     triaFlag = False
-#     posiFlag = False
-#
-#     with open(filename,'r') as f:
-#         for line in f:
-#             if '$ Nodes (Nod' in line:
-#                 posiFlag = True
-#             if '$ Elements and Boundary Co' in line:
-#                 triaFlag = True
-#                 posiFlag = False
-#             if posiFlag:
-#                 try:
-#                     (a, b, c, d) = line.split()
-#                 except:
-#                     continue
-#                 if int(a) >= posiRange[0] and int(a) <= posiRange[1]:
-#                     posi[int(a)] = (float(b), float(c), float(d))
-#
-#             if triaFlag:
-#                 try:
-#                     (a, b, c, d, e, f, g, h, i, j) = line.split()
-#                 except:
-#                     continue
-#                 if int(a) >= triaRange[0] and int(a) <= triaRange[1]:
-#                     tria[int(a)] = (int(b), int(c), int(d))
-#
-#     return (posi, tria)
 
 # Use it if needed to read mesh from input file
 def read_all_triangulation_input(filename):
@@ -120,7 +95,7 @@ def read_all_triangulation_input(filename):
         elif '$ Nodes' in line:
             pointFlag = True
     f.close()
-    return sp.array(points), sp.array(trias, dtype=sp.uint)  # points,trias
+    return np.array(points), np.array(trias, dtype=np.int)  # points,trias
 
 
 def read_triangulation_by_names_input(object_names, folder, input_name='input.dat'):
@@ -130,13 +105,13 @@ def read_triangulation_by_names_input(object_names, folder, input_name='input.da
     TODO: And load all points of object after encountering the first one?
     '''
     ranges = load_ranges(folder)
-    inputfile = myOS.pathjoin(folder, input_name)
+    inputfile = os.path.join(folder, input_name)
 
     result = {}
     for name in object_names:
         posiRange, triaRange = ranges.coords[name], ranges.trias[name]
-        posi = sp.zeros((posiRange[1] - posiRange[0] + 1, 3))
-        tria = sp.zeros((triaRange[1] - triaRange[0] + 1, 3), dtype=int)
+        posi = np.zeros((posiRange[1] - posiRange[0] + 1, 3))
+        tria = np.zeros((triaRange[1] - triaRange[0] + 1, 3), dtype=np.int)
         result[name] = posi, tria  # points, trias
 
     triaFlag = False
@@ -178,7 +153,7 @@ def read_triangulation_by_names_input(object_names, folder, input_name='input.da
     return coords_list, trias_list
 
 
-# Returns sp.array!
+# Returns np.array!
 def read_triangulation_input(filename, posiRange, triaRange):
     """
     filename is the name of the input file. (usually 'input.dat')
@@ -188,8 +163,8 @@ def read_triangulation_input(filename, posiRange, triaRange):
     with respect to those coordinates.
     """
 
-    tria = sp.zeros((triaRange[1] - triaRange[0] + 1, 3), dtype=int)
-    posi = sp.zeros((posiRange[1] - posiRange[0] + 1, 3))
+    tria = np.zeros((triaRange[1] - triaRange[0] + 1, 3), dtype=np.int)
+    posi = np.zeros((posiRange[1] - posiRange[0] + 1, 3))
     triaFlag = False
     posiFlag = False
     with open(filename, 'r') as f:  # in GK was just f = open(..) without closing
@@ -224,7 +199,7 @@ def read_triangulation_by_name_input(object_name, folder, input_name='input.dat'
     ranges = load_ranges(folder)
     posiRange, triaRange = ranges.coords[object_name], ranges.trias[object_name]
 
-    inputfile = myOS.pathjoin(folder, input_name)
+    inputfile = os.path.join(folder, input_name)
     posi, tria = read_triangulation_input(inputfile, posiRange, triaRange)
     return (posi, tria)
 
@@ -234,10 +209,10 @@ def triangleArea(v1, v2, v3):
     given three position vectors, calculate the area of a triangle, using
     Heron's formula.
     """
-    [v1, v2, v3] = [sp.array(v) for v in [v1, v2, v3]]
+    [v1, v2, v3] = [np.array(v) for v in [v1, v2, v3]]
     [a, b, c] = [lin.norm(d) for d in [v1 - v2, v2 - v3, v3 - v1]]
     s = (a + b + c) / 2.0
-    A = sp.sqrt(s * (s - a) * (s - b) * (s - c))
+    A = np.sqrt(s * (s - a) * (s - b) * (s - c))
     return A
 
 
@@ -258,7 +233,7 @@ def read_triangle_areas_input(filename, posiRange, triaRange):
     filename is the path to 'input.dat'
     """
     (posi, tria) = read_triangulation_input(filename, posiRange, triaRange)
-    areas = sp.zeros((triaRange[1] - triaRange[0] + 1))
+    areas = np.zeros((triaRange[1] - triaRange[0] + 1))
     for (i, t) in enumerate(tria):
         areas[i] = triangleArea(posi[t[0]], posi[t[1]], posi[t[2]])
     return areas
@@ -267,16 +242,16 @@ def read_triangle_areas_input(filename, posiRange, triaRange):
 def _exctract_data(posiRange, triaRange,
                    infile='input.dat',
                    outfile='output.dat'):
-    """ GK
+    """
     given a number range, that correspond to an object,
     read velocities, forces and positions and areas as np.arrays.
     """
     areas = read_triangle_areas_input(infile, posiRange, triaRange)
 
     num = triaRange[1] - triaRange[0] + 1
-    velocities = sp.zeros((num, 3))
-    forces = sp.zeros((num, 3))
-    positions = sp.zeros((num, 3))
+    velocities = np.zeros((num, 3))
+    forces = np.zeros((num, 3))
+    positions = np.zeros((num, 3))
 
     with open(outfile, 'r') as file:
         for line in file:
@@ -315,22 +290,12 @@ def load_ranges(folder):
     '''
     Helper function to load ranges/remembery in one line
     '''
-    import pandas
-    try:  # To read csv
-        ranges = Ranges()
-        objects_df = pandas.read_csv(myOS.Path(folder, 'ranges.csv'))
-        for idx, row in objects_df.iterrows():
-            name, coords_start, coords_end, trias_start, trias_end = row
-            ranges.coords[name] = (coords_start, coords_end)
-            ranges.trias[name] = (trias_start, trias_end)
-    except FileNotFoundError:
-        spec = imp_util.spec_from_file_location("remembery", myOS.pathjoin(folder, 'remembery.py'))
-        ranges = imp_util.module_from_spec(spec)
-        spec.loader.exec_module(ranges)
-        ## If problems with reloading remembery - try this code, or Gary's
-        # from importlib.machinery import SourceFileLoader
-        # remembery = SourceFileLoader("remembery", myOS.pathjoin(folder, 'remembery.py')).load_module()
-        # implib.reload(remembery)
+    ranges = Ranges()
+    objects_df = pd.read_csv(os.path.join(folder, 'ranges.csv'))
+    for idx, row in objects_df.iterrows():
+        name, coords_start, coords_end, trias_start, trias_end = row
+        ranges.coords[name] = (coords_start, coords_end)
+        ranges.trias[name] = (trias_start, trias_end)
     return ranges
 
 
@@ -349,8 +314,8 @@ def extract_data_by_name(object_name,
 
     res = _exctract_data(ranges.coords[object_name],
                          ranges.trias[object_name],
-                         infile=myOS.pathjoin(folder, infile),
-                         outfile=myOS.pathjoin(folder, outfile))
+                         infile=os.path.join(folder, infile),
+                         outfile=os.path.join(folder, outfile))
     return res
 
 
@@ -366,8 +331,8 @@ def extract_data_by_names(object_name_list,  # TODO: enter file only once!
     for object_name in object_name_list:
         res = _exctract_data(ranges.coords[object_name],
                              ranges.trias[object_name],
-                             infile=myOS.pathjoin(folder, infile),
-                             outfile=myOS.pathjoin(folder, outfile))
+                             infile=os.path.join(folder, infile),
+                             outfile=os.path.join(folder, outfile))
         res_list.append(res)
     return res_list
 
@@ -384,16 +349,24 @@ def extract_all_data(folder='.', infile='input.dat', outfile='output.dat'):
 def read_viscosity_hdf5(file_handle, group='.'):
     return file_handle[group]['visc'][()]
 
+def get_df_from_csv_str(csv_str):
+    '''
+    Convert str object to df. Assuming that str object has a structure of csv file.
+    '''
+    import io
+    csv_file = io.StringIO(csv_str)
+    df = pd.read_csv(csv_file)
+    return df
+
 
 def load_ranges_hdf5(file_handle, group='.'):
     '''
     Helper function to load ranges/remembery in one line
     '''
-    import processing.csvs as csvs
-    g = file_handle[myOS.Path(group).as_posix()]
+    g = file_handle[path_to_string(group)]
     ranges_csv_str = g['ranges'][()]
     ranges = Ranges()
-    objects_df = csvs.get_df_from_csv_str(ranges_csv_str)
+    objects_df = get_df_from_csv_str(ranges_csv_str)
     for idx, row in objects_df.iterrows():
         name, coords_start, coords_end, trias_start, trias_end = row
         ranges.coords[name] = (coords_start, coords_end)
@@ -402,12 +375,12 @@ def load_ranges_hdf5(file_handle, group='.'):
 
 
 def _extract_data_hdf5(triaRange, file_handle, group='.'):
-    """ GK
-    given a number range, that correspond to an object,
-    read velocities, forces and positions and areas as np.arrays.
-    AS: load from hdf5 file.
     """
-    g = file_handle[myOS.Path(group).as_posix()]
+    - given a number range, that correspond to an object,
+    read velocities, forces and positions and areas as np.arrays.
+    - load from hdf5 file.
+    """
+    g = file_handle[path_to_string(group)]
     t0, t1 = triaRange
     forces = g['forces'][t0:t1 + 1]
     velocities = g['velocities'][t0:t1 + 1]
@@ -417,13 +390,13 @@ def _extract_data_hdf5(triaRange, file_handle, group='.'):
     # Calculate areas
     node_positions = g['node_coords'][:]
     trias = g['trias'][t0:t1 + 1]
-    areas = sp.array([triangleArea(node_positions[t[0]], node_positions[t[1]], node_positions[t[2]]) for t in trias])
+    areas = np.array([triangleArea(node_positions[t[0]], node_positions[t[1]], node_positions[t[2]]) for t in trias])
 
     return ResultsData(forces, velocities, positions, visc, areas)
 
 
 def extract_all_data_hdf5(file, group='.'):
-    g = file[myOS.Path(group).as_posix()]
+    g = file[path_to_string(group)]
 
     forces = g['forces'][:]
     velocities = g['velocities'][:]
@@ -432,7 +405,7 @@ def extract_all_data_hdf5(file, group='.'):
     # Calculate areas
     node_positions = g['node_coords'][:]
     trias = g['trias'][:]
-    areas = sp.array([triangleArea(node_positions[t[0]], node_positions[t[1]], node_positions[t[2]])
+    areas = np.array([triangleArea(node_positions[t[0]], node_positions[t[1]], node_positions[t[2]])
                       for t in trias])
     return ResultsData(forces, velocities, positions, visc, areas)
 
@@ -451,7 +424,7 @@ def extract_data_by_names_hdf5(names, file, group='.'):
     '''
     ranges = load_ranges_hdf5(file, group)
 
-    g = file[myOS.Path(group).as_posix()]
+    g = file[path_to_string(group)]
 
     forces_full = g['forces'][()]
     velocities_full = g['velocities'][()]
@@ -468,7 +441,7 @@ def extract_data_by_names_hdf5(names, file, group='.'):
         positions = positions_full[t0:t1 + 1]
         # Calculate areas
         trias = g['trias'][t0:t1 + 1]
-        areas = sp.array([triangleArea(node_positions[t[0]], node_positions[t[1]], node_positions[t[2]])
+        areas = np.array([triangleArea(node_positions[t[0]], node_positions[t[1]], node_positions[t[2]])
                           for t in trias])
         # Save
         res = ResultsData(forces, velocities, positions, visc, areas)
@@ -517,7 +490,7 @@ class Source:
         :param path: either folder or hdf5 filename
         :param group: group in hdf5 file; ignored if `path` is a folder
         '''
-        self.path = myOS.Path(path)
+        self.path = Path(path)
         self.group = group
         if not self.path.exists():
             raise ValueError("Path doesn't point to a hdf5 file or directory")

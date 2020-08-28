@@ -1,0 +1,88 @@
+-------------------------------------------------------------------------------
+ Program:   3D_Stokes_Flow_FMM   (V. 1.0.1; Released January 14, 2014);        
+            A fast multiplole BEM code for general 3-D Stokes flow problems    
+ All Rights Reserved, 2009-2014 (For education and research use only)          
+ Developer: CAE Research Lab, University of Cincinnati, Ohio, USA              
+ Download:  http://urbana.mie.uc.edu/yliu/Software                             
+ Contact:   Dr. Yijun Liu;  Tel.: 1 (513) 556-4607;  E-mail: Yijun.Liu@uc.edu  
+-------------------------------------------------------------------------------
+Tuesday 02. April 2019, 17:36:11                                              
+ 
+  Number of boundary elements          =         744
+  Number of nodes for the mesh         =         376
+  Total number of DOFs                 =        2232
+  Constant mu                          =   1.00000000000000     
+  Maximum number of elements in a leaf =         100
+  Maximum number of tree levels        =          10
+  Tolerance for convergence for GMRES  =  1.000000000000000E-003
+  Number of expansion terms            =          12
+  Number of Gaussian points            =           7
+
+  Memory size of the large block a     =       522.3 Mb
+  Number of variables registered       =          88
+
+  Number of tree levels                =           4
+  Number of cells in tree structure    =          31
+ 
+  Calculating the b-vector ...
+  Calling the GMRES solver ...
+ 
+  WARNING GMRES : 
+        For M =           10  optimal value 
+        for LWORK =         33631
+ 
+                    CONVERGENCE HISTORY FOR GMRES
+ 
+Errors are displayed in unit:  6
+Warnings are displayed in unit:  6
+Matrix size:    2232
+Local matrix size:    2232
+Restart:      10
+Left preconditioning
+Iterative classical Gram-Schmidt
+User supplied initial guess
+True residual computed at restart
+Maximum number of iterations:   500
+Tolerance for convergence: 0.10E-02
+Backward error on the unpreconditioned system Ax = b:
+    the residual is normalised by ||b||
+Backward error on the preconditioned system (P1)A(P2)y = (P1)b:
+     the preconditioned residual is normalised by ||(P1)b||
+Optimal size for the workspace:  33631
+ 
+Convergence history: b.e. on the preconditioned system
+ Iteration   Arnoldi b.e.    True b.e.
+    1         0.3265E+00         --
+    2         0.1320E+00         --
+    3         0.5115E-01         --
+    4         0.2322E-01         --
+    5         0.1481E-01         --
+    6         0.9378E-02         --
+    7         0.5731E-02         --
+    8         0.3640E-02         --
+    9         0.2303E-02         --
+   10         0.2100E-02         --
+   11         0.2056E-02         --
+   12         0.1840E-02         --
+   13         0.1516E-02         --
+   14         0.1182E-02         --
+   15         0.1057E-02         --
+   16         0.1023E-02         --
+   17         0.9666E-03     0.9666E-03
+ 
+  Convergence achieved!
+B.E. on the preconditioned system:   0.97E-03
+B.E. on the unpreconditioned system: 0.22E-03
+info(1) =  0
+Number of iterations (info(2)):    17
+ Orthogonalisation : ICGS
+ Restart :           10
+ info(1) =            0   info(2) =           17
+ rinfo(1) =   9.666293204589253E-004   rinfo(2) =   2.152534453774783E-004
+ Optimal workspace =        33631
+ Solution : 
+ 
+  Total force acting on the body is:
+  -3.28371849436002        6.61169076197784       -2.87070725592875     
+ 
+ Total CPU time, wall-clock time used =      3.88 (sec),      3.89 (sec)

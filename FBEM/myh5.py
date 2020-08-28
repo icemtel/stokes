@@ -1,17 +1,8 @@
-import myOS
 import FBEM
 import h5py
 import FBEM.logs
-
-
-def prepare_csv_line(*entries, delimeter=","):
-    '''
-    Prepare a list of objects for writing into a csv file.
-    '''
-    line_str_list = map(str, entries)
-    line = delimeter.join(line_str_list) + "\n"
-    return line
-
+from FBEM.various import prepare_csv_line, path_to_string, subdirs
+import os
 
 
 def get_ranges_csv_str(input_folder):
@@ -19,7 +10,7 @@ def get_ranges_csv_str(input_folder):
     Read from `ranges.csv` what range of nodes/triangles each geometrical object had.
     '''
     try:
-        with open(myOS.Path(input_folder, 'ranges.csv'), 'r') as ranges_csv:
+        with open(os.path.join(input_folder, 'ranges.csv'), 'r') as ranges_csv:
             ranges_csv_str = ranges_csv.read()
     except:
         ranges = FBEM.load_ranges(input_folder)
@@ -29,8 +20,8 @@ def get_ranges_csv_str(input_folder):
         for name in object_names:
             coords_start, coords_end = ranges.coords[name]
             trias_start, trias_end = ranges.trias[name]
-            row_vals = [name,coords_start,coords_end,trias_start, trias_end]
-            ranges_csv_str +=  prepare_csv_line(*row_vals)
+            row_vals = [name, coords_start, coords_end, trias_start, trias_end]
+            ranges_csv_str += prepare_csv_line(*row_vals)
 
     return ranges_csv_str
 
@@ -44,11 +35,11 @@ def fbem_res_to_hdf5_handle(input_folder, output_file, group, metadata, float_ty
     :return:
     '''
     # Read data with FBEM package
-    group = myOS.Path(group).as_posix()
+    group = path_to_string(group)
     fbem_data = FBEM.extract_all_data(input_folder)
-    node_coords, trias = FBEM.read_all_triangulation_input(input_folder / 'input.dat')
+    node_coords, trias = FBEM.read_all_triangulation_input(os.path.join(input_folder, 'input.dat'))
     log_data = FBEM.logs.extract_data(input_folder)
-    with open(input_folder / 'output.log', 'r') as logfile:  # Raw Log file
+    with open(os.path.join(input_folder, 'output.log'), 'r') as logfile:  # Raw Log file
         log_str = logfile.read()
 
     compress_params = dict(compression='gzip', compression_opts=compression_level)  # from 0 to 9; in h5py default 4
@@ -77,7 +68,6 @@ def fbem_res_to_hdf5_handle(input_folder, output_file, group, metadata, float_ty
     g.create_dataset('ranges', data=ranges_csv_str)
 
 
-
 def subgroups_names(group, filename=None):
     '''
     :param group: h5py.Group unless filename is given
@@ -86,7 +76,7 @@ def subgroups_names(group, filename=None):
     '''
     if filename is not None:
         f = h5py.File(filename)
-        group = myOS.Path(group).as_posix()
+        group = path_to_string(group)
         g = f[group]
     else:
         g = group
@@ -100,9 +90,9 @@ def subgroups_names(group, filename=None):
 
 
 def visit_dirtree(folder_root, stuff_to_do, folder_relative='.'):
-    folder = myOS.pathjoin(folder_root, folder_relative)
-    for subdir in myOS.subdirs(folder):
-        visit_dirtree(folder_root, stuff_to_do, myOS.Path(folder_relative, subdir))
+    folder = os.path.join(folder_root, folder_relative)
+    for subdir in subdirs(folder):
+        visit_dirtree(folder_root, stuff_to_do, os.path.join(folder_relative, subdir))
     return stuff_to_do(folder_root, folder_relative)
 
 
@@ -111,8 +101,8 @@ def fbem_res_to_hdf5(input_folder, output_filename, group, metadata, mode='a', f
         return fbem_res_to_hdf5_handle(input_folder, f, group, metadata, float_type, compression_level)
 
 
-
-def fbem_res_tree_to_hdf5(input_folder, output_filename, mode='a', float_type='f8', compression_level=9, root_group='.'):
+def fbem_res_tree_to_hdf5(input_folder, output_filename, mode='a', float_type='f8', compression_level=9, root_group='.',
+                          report_progress=True):
     '''
     Browse directory tree - try to exctract simulation result from every folder; If an error occurs - skip the folder.
     Exctract raw log files from the root.
@@ -122,15 +112,18 @@ def fbem_res_tree_to_hdf5(input_folder, output_filename, mode='a', float_type='f
     import h5py
 
     with h5py.File(output_filename, mode) as f:
-        root_group = myOS.Path(root_group).as_posix()
+        root_group = path_to_string(root_group)
         f = f[root_group]
+
         def write_simulation(folder_root, folder_relative):
             try:
-                fbem_res_to_hdf5_handle(myOS.Path(folder_root, folder_relative), f, group=folder_relative,
+                fbem_res_to_hdf5_handle(os.path.join(folder_root, folder_relative), f, group=folder_relative,
                                         metadata={}, float_type=float_type, compression_level=compression_level)
-                print("Sucess:", str(folder_relative))
+                if report_progress is True:
+                    print("Sucess:", str(folder_relative))
             except:
-                print("Skipped:", str(folder_relative))
+                if report_progress is True:
+                    print("Skipped:", str(folder_relative))
                 pass
 
         visit_dirtree(input_folder, write_simulation)
