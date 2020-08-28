@@ -8,7 +8,7 @@ import FBEM.write_input as write
 # Default location of the executable file
 if os.name == 'posix': # Linux
     exe_path = os.path.dirname(__file__) +  '/exe/3D_Stokes_Flow_FMM_linux.exe'
-else: # Linux
+else: # Windows
     exe_path = os.path.dirname(__file__) +  '/exe/3D_Stokes_Flow_FMM_64.exe'
 
 def run(system, folder, params=None, exe_path=exe_path):

@@ -147,6 +147,9 @@ class Simulation:
     # metadata_filename = basic_folder / 'info.txt'
     # self._write_metadata(metadata_filename)
     def get_basic_folder(self, add_datestamp=True, date=None):
+        '''
+        Path to the simulation folder: consists of simulation name + optional datestamp
+        '''
         if add_datestamp:
             if date is None:
                 date = datestamp()
@@ -210,7 +213,8 @@ class Simulation:
 
     def list_unfinished_args_kwargs(self, ignore_remove_error=False):
         '''
-        Note: it's not very fast function when the list is long.
+        If Simulation was interrupted, list what was not finished yet
+        - Note: it's not very fast function when the list is long.
         '''
         unfinished_subfolders = self.list_unfinished(ignore_remove_error=ignore_remove_error)
         unfinished_args, unfinished_kwargs = [], []

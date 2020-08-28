@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(name='stokes',
-    #  version='',
-    #  description='',
+      #  version='',
+      #  description='',
       url='https://cfaed.tu-dresden.de/friedrich-home',
       author='Anton Solovev, Gary Klindt, Benjamin Friedrich',
       author_email='anton.solovev@tu-dresden.de',
       license='Internal Use',
-      packages=['mesh'],
+      packages=['mesh', 'FBEM', 'plot3D', 'simulation'],
       zip_safe=False)
