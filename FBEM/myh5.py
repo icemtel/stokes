@@ -21,7 +21,7 @@ def read_metadata(folder, filename='meta.json'):
     return meta_dict
 
 
-def subgroups_names(group, filename=None):
+def subgroup_names(group, filename=None):
     '''
     :param group: h5py.Group unless filename is given
     :param filename: If given, open this file. group is treated as a group identifier.

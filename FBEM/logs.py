@@ -132,7 +132,7 @@ def _extract_from_many_hdf5(group, max_depth=3, depth=1, rel_path=""):
     '''
     import FBEM.myh5 as myh5
     data_dict = {}
-    for key in myh5.subgroups_names(group):
+    for key in myh5.subgroup_names(group):
         relative_path = path_to_string(os.path.join(rel_path, key))
         try:
             log_dict = extract_data_hdf5(group[key], dtype=dict)
