@@ -48,7 +48,7 @@ def get_number_of_boundary_points_ellipse(lengths, max_area):
     k = 2 * 3 ** (-1 / 4)  # Coeff to connect linear and area-sizes of triangle.
     node_distance = k * np.sqrt(max_area)
     a, b = lengths
-    ellipse_perimeter = np.pi * (3 * (a + b) - np.sqrt((3 * a + b) * (a + 3 * b))) # Ramanujan's approximation
+    ellipse_perimeter = np.pi * (3 * (a + b) - np.sqrt((3 * a + b) * (a + 3 * b)))  # Ramanujan's approximation
     num_nodes_on_boundary = int(ellipse_perimeter / node_distance)
     return num_nodes_on_boundary
 
@@ -98,7 +98,7 @@ def triangulate_circle(center, radius, max_area, add_code='', add_points=None):
     return coords, trias
 
 
-def triangulate_ellipse(center, lengths, max_area, rotation_angle=0, add_code='',add_points=None):
+def triangulate_ellipse(center, lengths, max_area, rotation_angle=0, add_code='', add_points=None):
     '''
     At length ratio = 3 (and maybe even lower) this function can only be used on inner regions;
     Some points will be added to boundary by Triangle.
@@ -121,19 +121,18 @@ if __name__ == '__main__':
     '''
     import matplotlib.pyplot as plt
 
-
-    lengths = (10,5)
+    lengths = (10, 5)
     max_area = 3
 
     n_boundary = get_number_of_boundary_points_ellipse(lengths, max_area)
     add_points = np.array([[1, 0], [-1, 0], [0, 0], [0, -1], [0, 1]])
-    points = points_on_ellipse(n_boundary, lengths[0], lengths[1], rotation_angle=np.pi / 4, center= 5)
+    points = points_on_ellipse(n_boundary, lengths[0], lengths[1], rotation_angle=np.pi / 4, center=5)
     c, t = triangulate_ellipse(5, lengths, max_area, rotation_angle=np.pi / 4, add_points=add_points)
 
-    x0,y0 = points.transpose()
-    x,y = c.transpose()
+    x0, y0 = points.transpose()
+    x, y = c.transpose()
 
-    plt.triplot(x,y,t)
-    plt.scatter(x0,y0, c='red')
-    plt.scatter(add_points[:,0], add_points[:,1],c='green')
+    plt.triplot(x, y, t)
+    plt.scatter(x0, y0, c='red')
+    plt.scatter(add_points[:, 0], add_points[:, 1], c='green')
     plt.show()

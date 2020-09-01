@@ -277,11 +277,12 @@ def _exctract_data(posiRange, triaRange,
 
 class Ranges:
     '''
-    Define this class in a way to be compatible with the old definition and old code for remembery
+    Class contains range of coordinates and triangles, which belong to each meshed object.
     '''
 
     def __init__(self):
         # Will be filled with dictionaries
+        self.names = [] # list of objects
         self.coords = {}
         self.trias = {}
 
@@ -294,6 +295,7 @@ def load_ranges(folder):
     objects_df = pd.read_csv(os.path.join(folder, 'ranges.csv'))
     for idx, row in objects_df.iterrows():
         name, coords_start, coords_end, trias_start, trias_end = row
+        ranges.names.append(name)
         ranges.coords[name] = (coords_start, coords_end)
         ranges.trias[name] = (trias_start, trias_end)
     return ranges
@@ -369,6 +371,7 @@ def load_ranges_hdf5(file_handle, group='.'):
     objects_df = get_df_from_csv_str(ranges_csv_str)
     for idx, row in objects_df.iterrows():
         name, coords_start, coords_end, trias_start, trias_end = row
+        ranges.names.append(name)
         ranges.coords[name] = (coords_start, coords_end)
         ranges.trias[name] = (trias_start, trias_end)
     return ranges
@@ -535,3 +538,10 @@ class Source:
                 return extract_data_by_names_hdf5(names, file, self.group)
         else:
             return extract_data_by_names(names, self.path)
+
+    def read_ranges(self):
+        if self.is_hdf5:
+            with h5py.File(self.path, 'r') as file:
+                return  load_ranges_hdf5(file, self.group)
+        else:
+            return load_ranges(self.path)
