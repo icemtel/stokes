@@ -5,7 +5,7 @@ import logging
 import platform, sys
 from simulation.parallel_with_threads import run_parallel
 
-from simulation.evaluate import evaluate_and_assign_folder
+import simulation.evaluation
 
 finished_logname = "finished.log"
 sim_logname = 'sim.log'
@@ -124,23 +124,26 @@ class Simulation:
         self._log_handler = None
         self._formatter = None
 
-    def evaluate_given_args(self, *args, **kwargs):
+    def evaluate_given_args(self, *args, parent_folder='tmp/', **kwargs):
         '''
         output - folder name
+        :param parent_folder: where the results should be saved (subfolder will be created)
         '''
-        return evaluate_and_assign_folder(self.function_to_run, *args,
-                                          folder_generator=self.subfolder_generator, input_space=self.args_list,
-                                          **kwargs)
+        return simulation.evaluation.evaluate_and_assign_folder(self.function_to_run, *args,
+                                                                folder_generator=self.subfolder_generator,
+                                                                parent_folder=parent_folder, input_space=self.args_list,
+                                                                **kwargs)
 
-    def evaluate(self, id=None, pick_random=False):
+    def evaluate(self, id=None, pick_random=False, parent_folder='tmp/', temp_folder=True):
         '''
         output - folder name
+        :param parent_folder: where the results should be saved (subfolder will be created)
         '''
         if pick_random == True:
             import random
-            id = random.randint(0, len(self.args_list) - 1)
+            id = random.randint(0, len(self.args_list) - 1) # draw random arguments from the list
 
-        return self.evaluate_given_args(*self.args_list[id], **self.kwargs_list[id])
+        return self.evaluate_given_args(*self.args_list[id], parent_folder=parent_folder, **self.kwargs_list[id])
 
     # def _write_metadata(self, filename):
     #     pass
