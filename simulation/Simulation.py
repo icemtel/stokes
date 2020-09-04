@@ -134,7 +134,7 @@ class Simulation:
                                                                 parent_folder=parent_folder, input_space=self.args_list,
                                                                 **kwargs)
 
-    def evaluate(self, id=None, pick_random=False, parent_folder='tmp/', temp_folder=True):
+    def evaluate(self, id=None, pick_random=False, parent_folder='tmp/'):
         '''
         output - folder name
         :param parent_folder: where the results should be saved (subfolder will be created)
@@ -142,6 +142,8 @@ class Simulation:
         if pick_random == True:
             import random
             id = random.randint(0, len(self.args_list) - 1) # draw random arguments from the list
+        elif id==None:
+            raise ValueError("Unless pick_random=True, id has to be given")
 
         return self.evaluate_given_args(*self.args_list[id], parent_folder=parent_folder, **self.kwargs_list[id])
 

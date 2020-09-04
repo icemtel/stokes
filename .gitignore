@@ -5,3 +5,4 @@
 scripts/*
 FBEM/example/data/*
 test/data/parallel/spheres/test/*
+simulation/tmp/

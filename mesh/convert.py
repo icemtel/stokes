@@ -11,10 +11,10 @@ from mesh import prepare_system
 ## Function to convert system to Triangulation
 def triangulate_system(*tria_generator_args, tria_generator=None, external_flow_field=None):
     '''
-    Function which transform several objects (combined into a system) into triangulation.
-    Use GK's functions to deal with nested dictionary of objects.
-
-    Use: triangulate_system(system)
+    EXAMPLE:
+    sphere = create_sphere(..)
+    system = prepare_system(sphere)
+    triangulation = triangulate_system(system)
 
     :param tria_generator_args: by default - only system
     :param external_flow_field:

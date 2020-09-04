@@ -37,7 +37,7 @@ def evaluate_and_assign_folder(function_to_run, *args, folder_generator=None, pa
     if parent_folder is None:
         parent_folder = 'tmp/'
     if folder_generator is None:
-        timestr = time.strftime("testrun %Y-%m-%d %H-%M")
+        timestr = time.strftime("testrun %Y-%m-%d %H.%M")
         folder = os.path.join(parent_folder, timestr)
     else:
         folder = os.path.join(parent_folder, folder_generator(*args, **kwargs))
