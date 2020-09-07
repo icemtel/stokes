@@ -288,10 +288,17 @@ class Ranges:
         self.coords = {}
         self.trias = {}
 
+    def get_names(self):
+        '''
+        :return: object names without "all"
+        '''
+        names = self.names.copy()
+        names.remove("all")
+        return names
 
 def load_ranges(folder):
     '''
-    Helper function to load ranges/remembery in one line
+    Create Ranges class from a ranges.csv file.
     '''
     ranges = Ranges()
     objects_df = pd.read_csv(os.path.join(folder, 'ranges.csv'))
