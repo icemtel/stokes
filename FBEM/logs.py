@@ -3,19 +3,17 @@ import os
 from FBEM.various import path_to_string, subdirs, Path
 
 class LogData:
-    def __init__(self, info1, numIter, bePRE, beUNPRE, time_cpu, time_wall):
+    def __init__(self, info1, numIter, bePRE, beUNPRE, time_cpu):
         self.info1 = info1  # info1 =  -4 if the algorithm failed in converge in maximum number of iterations; else 0
         self.numIter = numIter
         self.bePRE = bePRE
         self.beUNPRE = beUNPRE
         self.time_cpu = time_cpu
-        self.time_wall = time_wall # wall-clock time spent to run the problem
-        # TODO: wall-clock time is negative sometimes?! - don't use it or figure out what's the problem
 
     def __str__(self):
         return "info1 = {0},\tnumIter = {1},\tbePRE = {2:.3g},\tbeUNPRE = {3:.3g}," \
-               "\ttime_cpu = {4:.3g},\ttime_wall={5:.3g}". \
-            format(self.info1, self.numIter, self.bePRE, self.beUNPRE, self.time_cpu, self.time_wall)
+               "\ttime_cpu = {4:.3g}". \
+            format(self.info1, self.numIter, self.bePRE, self.beUNPRE, self.time_cpu)
 
 
 def _extract_data(file, dtype):
