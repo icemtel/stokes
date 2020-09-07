@@ -21,10 +21,8 @@ def run(system, folder, params=None, exe_path=exe_path):
     '''
     os.makedirs(folder, exist_ok=True) # create folder
     write.write_input_cnd(folder, params) # write input file
-
-    logging.info("Start:  Create FBEM input files")
     write.write_input_and_ranges(folder, system)
-    logging.info("Finish: Create FBEM input files")
+    logging.info("Success: Create FBEM input files")
 
     run_from_input(folder, exe_path=exe_path)
     remove_plt(folder)  # To save storage space
@@ -37,7 +35,6 @@ def run_from_input(folder='.', exe_path=exe_path):
     If running on linux with threading - assign a single core for each process
     (otherwise FBEM will try to use up every core)
     '''
-    logging.info("Start:  FBEM run")
     # If on Linux, and threading is enabled, limit each FBEM process to a single core.
     if 'threading' in sys.modules and os.name == 'posix':
         import threading
@@ -50,7 +47,7 @@ def run_from_input(folder='.', exe_path=exe_path):
             call_until_success(command, working_dir=folder)
     else:  # Windows executable works only in one process, so we don't have to limit it.
         call_until_success(exe_path, working_dir=folder)
-    logging.info("Finish: FBEM run")
+    logging.info("Success: FBEM run")
 
 
 # ----- Helpers functions ------
