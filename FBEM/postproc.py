@@ -37,11 +37,13 @@ def read_viscosity(folder, infile="input.dat"):
 def calc_flowfield(coordinates, forces, visc=1):
     coordinates = np.array(coordinates)
     const = 1 / 8 / np.pi / visc
+
     def hfunc(r):
         dr = r - coordinates
         ndr = np.linalg.norm(dr, axis=1)
         fdr = np.array(np.sum(forces * dr, axis=1))
-        return  np.sum(np.transpose((np.transpose(np.transpose(dr) * fdr / (ndr * ndr)) + forces)) * const / ndr, axis=1)
+        return np.sum(np.transpose((np.transpose(np.transpose(dr) * fdr / (ndr * ndr)) + forces)) * const / ndr, axis=1)
+
     return hfunc
 
 
@@ -282,7 +284,7 @@ class Ranges:
 
     def __init__(self):
         # Will be filled with dictionaries
-        self.names = [] # list of objects
+        self.names = []  # list of objects
         self.coords = {}
         self.trias = {}
 
@@ -299,13 +301,6 @@ def load_ranges(folder):
         ranges.coords[name] = (coords_start, coords_end)
         ranges.trias[name] = (trias_start, trias_end)
     return ranges
-
-
-def load_object_names(folder):
-    ranges = load_ranges(folder)
-    ranges.coords.pop('all', None)  # Remove 'all' object
-    object_names = list(ranges.coords.keys())
-    return object_names
 
 
 def extract_data_by_name(object_name,
@@ -350,6 +345,7 @@ def extract_all_data(folder='.', infile='input.dat', outfile='output.dat'):
 
 def read_viscosity_hdf5(file_handle, group='.'):
     return file_handle[group]['visc'][()]
+
 
 def get_df_from_csv_str(csv_str):
     '''
@@ -542,6 +538,6 @@ class Source:
     def read_ranges(self):
         if self.is_hdf5:
             with h5py.File(self.path, 'r') as file:
-                return  load_ranges_hdf5(file, self.group)
+                return load_ranges_hdf5(file, self.group)
         else:
             return load_ranges(self.path)
