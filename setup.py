@@ -7,5 +7,5 @@ setup(name='stokes',
       author='Anton Solovev, Gary Klindt, Benjamin Friedrich',
       author_email='anton.solovev@tu-dresden.de',
       license='Internal Use',
-      packages=['mesh', 'FBEM', 'plot3D', 'simulation'],
+      packages=['mesh', 'FBEM', 'simulation'],
       zip_safe=False)

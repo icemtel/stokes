@@ -1,4 +1,4 @@
-from plot3D.mlabMeshViewer import MeshViewer
+from mesh.plot.mlab_viewer import MeshViewer
 
 mv = MeshViewer('data/sphere_wall')
 mv.triangular_mesh()

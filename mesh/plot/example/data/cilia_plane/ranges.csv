@@ -1,0 +1,13 @@
+name,coords_start,coords_end,trias_start,trias_end
+flagellum_1,0,489,0,975
+flagellum_2,490,979,976,1951
+flagellum_3,980,1469,1952,2927
+flagellum_4,1470,1959,2928,3903
+flagellum_5,1960,2449,3904,4879
+flagellum_6,2450,2939,4880,5855
+flagellum_7,2940,3429,5856,6831
+flagellum_8,3430,3919,6832,7807
+flagellum_9,3920,4409,7808,8783
+flagellum_10,4410,4899,8784,9759
+plane,4900,8532,9760,17021
+all,0,8532,0,17021

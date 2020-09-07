@@ -7,24 +7,20 @@ OK: 2 commands with different objects
 
 OK: indices to skip don't work?
 '''
-from plot3D.mlabMeshViewer import MeshViewer
+from mesh.plot.mlab_viewer import MeshViewer
 
-
-folder = 'data/two_cilia_machemer0' #'data/sphere_wall'
+folder = 'data/two_cilia_machemer0'  # 'data/sphere_wall'
 cilium_radius = 0.11
-
-#mmv.quick_mesh_plot(folder)
 
 plotter = MeshViewer(folder)
 
 plotter.triangular_mesh(['flagellum_1', 'flagellum_2'], representation='fancymesh')
-#plotter.force_density_arrows(['flagellum_2'],n=12, indices_to_skip=list(range(-12,0)))
+# plotter.force_density_arrows(['flagellum_2'],n=12, indices_to_skip=list(range(-12,0)))
 plotter.force_density_arrows(['flagellum_1', 'flagellum_2'], points_per_arrow=12, indices_to_skip=list(range(-12, 0)),
                              offset_distance=cilium_radius, inverse_direction=True)
-plotter.velocity_arrows(['flagellum_1', 'flagellum_2'], points_per_arrow=12, indices_to_skip=list(range(-12, 0)),)
+plotter.velocity_arrows(['flagellum_1', 'flagellum_2'], points_per_arrow=12, indices_to_skip=list(range(-12, 0)), )
 
 plotter.show()
-
 
 ### Test averaging
 # import scipy as sp
