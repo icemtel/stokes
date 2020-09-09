@@ -17,6 +17,8 @@
 
 ## Simulation scripts
 /scripts/
+## Docs (maybe add later)
+/docs/
 
 # FBEM executable
 *.exe

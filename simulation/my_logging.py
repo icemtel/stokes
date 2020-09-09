@@ -8,9 +8,9 @@ def log_metadata_and_start_message(num_processes, logger):
     logger.info(python_version)
     logger.info("%s %s", pc_name, os_info)
     if num_processes > 1:
-        logger.info("Start: Run simulations on with %d threads", num_processes)
+        logger.info("Start: Run simulations with %d threads", num_processes)
     else:
-        logger.info("Start: Run simulations on with %d thread", num_processes)
+        logger.info("Start: Run simulations with %d thread", num_processes)
 
 
 def setup_logging(filename=None, mode='a', print_log_messages=True, level=logging.INFO):
