@@ -36,15 +36,15 @@ def _extract_data(file, dtype):
         if be_read and line[:15] == ' Total CPU time':
             linesplit = line.split()
             time_cpu = float(linesplit[-4])
-            time_wall = float(linesplit[-2])
+           #  time_wall = float(linesplit[-2])
             # if time_wall <0 or time_cpu <0:
             #     print(time_wall)
     if dtype == None:
-        return LogData(info1, numIter, bePRE, beUNPRE, time_cpu, time_wall)
+        return LogData(info1, numIter, bePRE, beUNPRE, time_cpu)
     elif dtype == dict:
-        return dict(info1=info1, numIter=numIter, bePRE=bePRE, beUNPRE=beUNPRE,time_cpu=time_cpu, time_wall=time_wall)
+        return dict(info1=info1, numIter=numIter, bePRE=bePRE, beUNPRE=beUNPRE,time_cpu=time_cpu)
     else:
-        return dtype((info1, numIter, bePRE, beUNPRE,time_cpu, time_wall))
+        return dtype((info1, numIter, bePRE, beUNPRE,time_cpu))
 
 
 
