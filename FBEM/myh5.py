@@ -81,10 +81,10 @@ def fbem_res_tree_to_hdf5(input_folder, output_filename, mode='a', float_type='f
 
         visit_dirtree(input_folder, write_simulation)
         try:
-            with open(input_folder / 'finished.log', 'r') as logfile:
+            with open(os.path.join(input_folder, 'finished.log'), 'r') as logfile:
                 log_str = logfile.read()
             f.create_dataset('finished.log', data=log_str)
-            with open(input_folder / 'sim.log', 'r') as logfile:
+            with open(os.path.join(input_folder, 'sim.log'), 'r') as logfile:
                 log_str = logfile.read()
             f.create_dataset('sim.log', data=log_str)
         except:
