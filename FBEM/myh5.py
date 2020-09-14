@@ -72,7 +72,9 @@ def fbem_res_tree_to_hdf5(input_folder, output_filename, mode='a', float_type='f
                                         float_type=float_type, compression_level=compression_level)
                 if report_progress is True:
                     print("Sucess:", str(folder_relative))
-            except:
+            except KeyboardInterrupt: # If there was a keyboard interrupt -> stop computation
+                raise
+            except: # Any other error => skip it and continue to the next folder
                 if report_progress is True:
                     print("Skipped:", str(folder_relative))
                 pass
