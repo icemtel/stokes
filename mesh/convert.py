@@ -66,45 +66,6 @@ def add_external_flow_field(mesh, flow):
     return mesh
 
 
-def fuseTriangulation(coordinates1, triangulation1, velocities1,
-                      coordinates2, triangulation2, velocities2):
-    """
-    fuse coordinates and velocities, and finally triangulation.
-
-    - coordinates{1,2} is a list of points, each.
-    - triangulation{1,2} is list of triples, each. Its values are to interpreted
-      as phi of the velocities and coordinates.
-      Be very careful here:
-        ! indices start at 0 !
-    - velocities{1,2} is a list of vectors, each.
-
-    ! This function is not used anywhere. But maybe I will need it later - keep it for now.
-    """
-    coordNum1 = len(coordinates1)
-    coordNum2 = len(coordinates2)
-    triaNum1 = len(triangulation1)
-    triaNum2 = len(triangulation2)
-    coordinates = np.zeros(coordNum1 + coordNum2)
-    velocities = np.zeros(coordNum1 + coordNum2)
-    triangulation = np.zeros(triaNum1 + triaNum2)
-
-    for c in range(coordNum1):
-        coordinates[c] = coordinates1[c]
-        velocities[c] = velocities1[c]
-    for c in range(coordNum2):
-        coordinates[c + coordNum1] = coordinates2[c]
-        velocities[c + coordNum1] = velocities2[c]
-
-    for t in range(triaNum1):
-        triangulation[t] = triangulation1[t]
-    for t in range(triaNum2):
-        triangulation[t + triaNum1] = triangulation2[t] + coordNum1
-
-    return {'coordinates': coordinates,
-            'triangulation': triangulation,
-            'velocities': velocities}
-
-
 def adaptVelocity(coordinates=None,
                   velocities=None,
                   rotation=None,

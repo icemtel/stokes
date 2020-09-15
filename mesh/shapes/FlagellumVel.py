@@ -157,7 +157,7 @@ def prepareFlagellaVel(points, vels, tangents, normals, radius, nTheta, type='fl
         triangulation.append((tip_idx, i3, i2))
     triangulation.append((tip_idx, circle_idxs[0], circle_idxs[-1]))
 
-    c = np.array(coordinates)
-    v = np.array(velocities)
-    t = np.array(triangulation, dtype=np.uint)
+    c = np.array(coordinates) # node coordinates
+    v = np.array(velocities) # node velocities
+    t = np.array(triangulation, dtype=np.uint) # nodes indices in each triangle
     return (c, v, t)
