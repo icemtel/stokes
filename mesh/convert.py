@@ -46,7 +46,7 @@ def fuse_mesh(system):
     # ellipsoid) are transformed to meshes
     meshes = rules2meshes(system)
     # those meshes are then orgaized in a tree structure, given by the
-    # FMM.meshObject.System class
+    # mesh.Triangulation.System class
     mesh_system = meshes2system(meshes)
     # velocity, angular velocity, rotation and translation of nodes of the
     # tree above are performed.
@@ -64,32 +64,6 @@ def add_external_flow_field(mesh, flow):
     for (r, v) in zip(mesh.coordinates, mesh.velocities):
         v += flow(r)
     return mesh
-
-
-def adaptVelocity(coordinates=None,
-                  velocities=None,
-                  rotation=None,
-                  velocity=None,
-                  angular=None):
-    """
-    changes mesh velocities due to the information given in its arguments
-    """
-    for v in range(len(velocities)):
-        for i in range(len(velocities[v])):
-            velocities[v][i] = np.dot(rotation,
-                                      velocities[v][i] + np.cross(np.array(angular), coordinates[v][i])) + np.array(
-                velocity)
-
-
-def adaptCoordinates(coordinates=None,
-                     translation=None,
-                     rotation=None):
-    """
-    change coordinates due to rotation and translation.
-    """
-    for c in range(len(coordinates)):
-        for i in range(len(coordinates[c])):
-            coordinates[c][i] = np.dot(rotation, coordinates[c][i]) + translation
 
 
 def rules2meshes(rules):
