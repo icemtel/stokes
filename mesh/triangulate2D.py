@@ -7,7 +7,7 @@ import numpy as np
 def triangulate_with_triangle(points, max_area, add_code=''):
     '''
     Create triangulation using *triangle* library (don't forget to cite it)
-    Parameters: q - quality meshing (restrict triangles angles to be >20 degrees),
+    Parameters: q - quality meshing (restrict triangles angles to be smaller than 20 degrees),
                 a - restriction on maximum triangle area,
                 Y - forbid to put new points on the boundary -
                  to make sure we connect top and bottom sides of ellipse correctly
