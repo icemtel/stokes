@@ -75,8 +75,6 @@ def FlagellaPlaneViewer(path, phases, num_phases, group='.', cmap='jet', plane_c
     - Color flagella in accordance with their phase
     - Assume first N objects - cilia/flagella, and N+1th object - plane
     '''
-    source = FBEM.Source(path, group)
-
     colors_list = get_colors(num_phases, cmap=cmap)
 
     flagella_colors = []
