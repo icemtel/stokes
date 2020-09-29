@@ -9,7 +9,7 @@ import FBEM
 import numpy as np
 
 
-def get_colors(num, cmap):
+def get_colors(num, cmap, endpoint=True):
     '''
     :param num: How many colors to return
     :param cmap: e.g. 'jet' 'viridis' 'RdBu_r' 'hsv'
@@ -17,8 +17,7 @@ def get_colors(num, cmap):
     '''
     import matplotlib.cm as mcm
     cm = getattr(mcm, cmap)
-    return cm(np.linspace(0, 1, num))
-
+    return cm(np.linspace(0, 1, num, endpoint=endpoint))
 
 def triangulation_to_trimesh(tri):
     """
@@ -75,7 +74,7 @@ def FlagellaPlaneViewer(path, phases, num_phases, group='.', cmap='jet', plane_c
     - Color flagella in accordance with their phase
     - Assume first N objects - cilia/flagella, and N+1th object - plane
     '''
-    colors_list = get_colors(num_phases, cmap=cmap)
+    colors_list = get_colors(num_phases, cmap=cmap, endpoint=False)
 
     flagella_colors = []
     for phase in phases:
