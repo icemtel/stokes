@@ -29,5 +29,8 @@ Can find velocities from forces, or vice-versa, and mixed problems
 - Check if there is execution permission on Linux.
 
 
+Usage:
+- see examples in `FBEM/example`
+- For simplicity, the fluid viscosity is always set to 1.
 
 
