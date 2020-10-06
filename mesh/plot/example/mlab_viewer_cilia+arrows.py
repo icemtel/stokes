@@ -9,7 +9,7 @@ OK: indices to skip don't work?
 '''
 from mesh.plot.mlab_viewer import MeshViewer
 
-folder = 'data/two_cilia_machemer0'  # 'data/sphere_wall'
+folder = 'data/cilia_plane2'  # 'data/sphere_wall'
 cilium_radius = 0.11
 
 plotter = MeshViewer(folder)

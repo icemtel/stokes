@@ -23,12 +23,13 @@ def get_colors(num, cmap, endpoint=True):
     cm = getattr(mcm, cmap)
     return cm(np.linspace(0, 1, num, endpoint=endpoint))
 
+
 def get_cilium_colors_rgb(num_phases, cmap='hsv'):
     '''
     Returns colors, coding cilia phases.
     '''
     colors = get_colors(num_phases, cmap, endpoint=False)
-    colors = [c[:3] for c in colors] # only RGB, no alpha
+    colors = [c[:3] for c in colors]  # only RGB, no alpha
     return colors
 
 
@@ -81,11 +82,7 @@ def MeshViewer(path, names=None, colors=None, group='.'):
         m = source_to_vedo_mesh(source, name, c=color)
         meshes.append(m)
 
-
-#   m_combined = vedo.merge(*meshes) # loses individual colors
-    m_combined = meshes[0]
-    for m in meshes[1:]:
-        m_combined += m
+    m_combined = vedo.assembly.Assembly(meshes)  # vedo.merge(*meshes) # loses individual colors
     return m_combined
 
 
@@ -110,3 +107,183 @@ def FlagellaPlaneViewer(path, phases, num_phases, group='.', cmap='hsv', plane_c
 
     m_combined = flagella_mesh + plane_mesh
     return m_combined
+
+
+def _average_values(vals, weights=None, n=1, indices_to_skip=None):
+    '''
+    - Take average of groups of every n elements.
+        - If there are less than n elements in the tail, take the average of those and append to the result anyway.
+    - Skip elements which indices are given in `indices_to_skip`.
+    - Return a list of averaged values.
+    - Values can be n-dimensional.
+    '''
+
+    # Modify indices_to_skip; replacing negative values with positive, to be correctly compared with idx
+    def chunks(l, n):
+        """
+        Yield successive n-sized chunks from l.
+        Last chunk will be smaller and will contain the rest of the elements
+        """
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
+    if weights is None:
+        weights = np.ones(vals.shape[0])
+
+    if indices_to_skip is not None:
+        indices_to_skip_array = np.array(indices_to_skip)
+        indices_to_skip_array = np.where(indices_to_skip_array >= 0, indices_to_skip_array,
+                                         indices_to_skip_array + len(vals))
+        vals = np.delete(vals, indices_to_skip_array, axis=0)  # Skip values
+
+    vals_new = []
+    for vals_chunk, weights_chunk in zip(chunks(vals, n), chunks(weights, n)):
+        val_new = np.average(vals_chunk, axis=0, weights=weights_chunk)
+        vals_new.append(val_new)
+
+    return np.array(vals_new)
+
+
+# def vector_avg_and_auto_scale(coords, vectors, points_per_arrow, arrow_length_range, indices_to_skip=None):
+#     """
+#     - Returns list of vectors to display
+#     - Reduces number of vectors by taking averages
+#     - Rescales vectors s.t. maximum vector length equals to arrow_length_range[1]
+#     - Vectors which are shorter than arrow_length_range[0] are removed from the output
+#     - returns average coordinates, average vectors (rescaled), and the vector scale (rescaling factor)
+#     """
+#     # Check:
+#     assert len(coords) == len(vectors)
+#     min_arrow_length, max_arrow_length = arrow_length_range
+#     coords_avg = np.array(_average_values(coords, weights=None, n=points_per_arrow, indices_to_skip=indices_to_skip))
+#     vectors_avg = np.array(_average_values(vectors, weights=None, n=points_per_arrow, indices_to_skip=indices_to_skip))
+#     # Determine scale
+#     magnitude_max = np.linalg.norm(vectors_avg, axis=1).max()
+#     scale = max_arrow_length / magnitude_max
+#     vectors_avg *= scale  # rescale vectors
+#
+#     coords_new = []
+#     vectors_new = []
+#     for c, v in zip(coords_avg, vectors_avg):
+#         arrow_length = np.linalg.norm(v)
+#         if arrow_length > min_arrow_length:  # do not plot really small arrows
+#             coords_new.append(c)
+#             vectors_new.append(v)
+#
+#     return np.array(coords_new), np.array(vectors_new), scale
+
+
+def vector_avg_and_scale(coords, vectors, points_per_arrow, scale=1., min_arrow_length=0., indices_to_skip=None):
+    """
+    - Returns list of vectors to display
+    - Reduces number of vectors by taking averages
+    - Rescales vectors by a given number `scale`
+    - Vectors which are shorter than `min_arrow_length` are removed from the output
+    - returns average coordinates, average vectors (rescaled), and the vector scale (rescaling factor)
+    """
+    # Check:
+    assert len(coords) == len(vectors)
+    coords_avg = np.array(_average_values(coords, weights=None, n=points_per_arrow, indices_to_skip=indices_to_skip))
+    vectors_avg = np.array(_average_values(vectors, weights=None, n=points_per_arrow, indices_to_skip=indices_to_skip))
+    # Scale
+    vectors_avg *= scale  # rescale vectors
+
+    coords_new = []
+    vectors_new = []
+    for c, v in zip(coords_avg, vectors_avg):
+        arrow_length = np.linalg.norm(v)
+        if arrow_length > min_arrow_length:  # do not plot really small arrows
+            coords_new.append(c)
+            vectors_new.append(v)
+
+    return np.array(coords_new), np.array(vectors_new)
+
+
+def VelocityArrows(path, names, points_per_arrow, scale=1.,
+                   c='blue', min_arrow_length=0., group='.', **kwargs):
+    '''
+    Averages arrows over several elements =>
+    - works correctly only if they are located nearby;
+    - Tested only on cilia
+    :param source:
+    :param names:
+    :param points_per_arrow:
+    :param scale: multiply arrow lengths by scale
+    :param min_arrow_length: do not plot arrows below this length
+    :param group: if inside hdf5 file - hdf5 group
+    :param **kwargs: passed to Arrows class
+    :return: arrow object and scale
+    '''
+    source = FBEM.Source(path, group)
+    to_plot_list = []
+    for name in names:
+        data_cilium = source.read_data(name)  # data on the cilium
+        # Data
+        coords = data_cilium.coordinates
+        vels = data_cilium.velocities
+        # forces = data_cilium.forces
+        # areas = data_cilium.areas
+        # sign = +1  # flip forces arrows
+        # force_densities = sign * forces / areas[:, np.newaxis]
+
+        #  Velocity Arrows
+        coords_avg, vectors_avg = vector_avg_and_scale(coords, vels, points_per_arrow, scale, min_arrow_length)
+        if len(coords_avg) > 0:
+            startPoints = coords_avg
+            endPoints = coords_avg + vectors_avg
+
+            print(np.amax(np.linalg.norm(vectors_avg, axis=1)))
+            arrows = vedo.shapes.Arrows(startPoints, endPoints, c=c, **kwargs)
+            to_plot_list.append(arrows)
+    arrows_combined = vedo.assembly.Assembly(to_plot_list)
+    return arrows_combined
+
+
+# def VelocityArrows(source, names, points_per_arrow, arrow_length_range):
+#     '''
+#     Averages arrows over several elements =>
+#     - works correctly only if they are cocated nearby;
+#     - Tested only on cilia
+#     :param source:
+#     :param names:
+#     :param points_per_arrow:
+#     :param arrow_length_range: min and maximum arrow lengths;
+#     :return: arrow object and scale
+#     '''
+
+def ForceArrows(path, names, points_per_arrow, scale=1.,
+                c='red', min_arrow_length=0., group='.', **kwargs):
+    '''
+    Averages arrows over several elements =>
+    - works correctly only if they are located nearby;
+    - Tested only on cilia
+    :param source:
+    :param names:
+    :param points_per_arrow:
+    :param scale: multiply arrow lengths by scale
+    :param min_arrow_length: do not plot arrows below this length
+    :param group: if inside hdf5 file - hdf5 group
+    :param **kwargs: passed to Arrows class
+    :return: arrow object and scale
+    '''
+    source = FBEM.Source(path, group)
+    to_plot_list = []
+    for name in names:
+        data_cilium = source.read_data(name)  # data on the cilium
+        # Data
+        coords = data_cilium.coordinates
+        forces = data_cilium.forces
+        areas = data_cilium.areas
+        force_densities = forces / areas[:, np.newaxis]
+
+        #  Velocity Arrows
+        coords_avg, vectors_avg = vector_avg_and_scale(coords, force_densities,
+                                                              points_per_arrow, scale, min_arrow_length)
+        startPoints = coords_avg
+        endPoints = coords_avg + vectors_avg
+
+        if len(coords_avg) > 0:
+            arrows = vedo.shapes.Arrows(startPoints, endPoints, c=c, **kwargs)
+            to_plot_list.append(arrows)
+    arrows_combined = vedo.assembly.Assembly(to_plot_list)
+    return arrows_combined

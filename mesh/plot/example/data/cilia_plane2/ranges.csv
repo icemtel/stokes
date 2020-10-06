@@ -1,0 +1,5 @@
+name,coords_start,coords_end,trias_start,trias_end
+flagellum_1,0,489,0,975
+flagellum_2,490,979,976,1951
+plane,980,1768,1952,3525
+all,0,1768,0,3525
