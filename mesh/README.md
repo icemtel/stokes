@@ -12,6 +12,14 @@ Features:
 
 ---
 
+## Create mesh
+- Look at examples
+- Unmeshed objects are kept in a form of nested dictionaries
+  (e.g. (1) object1 -> rotate;  (2) object2 -> translate;   (3): combine (1)+(2))
+- Meshed objected are stored as Triangulation class with attributes `coordinates`, `triangulation` (triangles), `velocities`;
+  - Note: there is some inconsistency with triangulation read from FBEM input files; they are read as two arrays: 
+    `coordinates`, `triangles`.
+
 ## mesh.plot
 
 There are different ways to visualize 3D objects in Python: `matplotlib`, `mayavi`, `trimesh`.

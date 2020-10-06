@@ -68,7 +68,7 @@ def MeshViewer(path, names=None, colors=None, group='.'):
     return m_combined
 
 
-def FlagellaPlaneViewer(path, phases, num_phases, group='.', cmap='jet', plane_color=(0.5, 0.5, 0.5, 1)):
+def FlagellaPlaneViewer(path, phases, num_phases, group='.', cmap='hsv', plane_color=(0.5, 0.5, 0.5, 1)):
     '''
     Visualize flagella and the plane.
     - Color flagella in accordance with their phase
