@@ -22,16 +22,25 @@ Features:
 
 ## mesh.plot
 
-There are different ways to visualize 3D objects in Python: `matplotlib`, `mayavi`, `trimesh`.
+There are different ways to visualize 3D objects in Python: `matplotlib`, `mayavi`, `trimesh`, `vedo`.
 - Therefore there are several python files for each of these methods.
+- Recommended way: `vedo` or `trimesh`. 
 - examples in `mesh.plot.example`
+
+### `vedo`
+- `vedo` is built on top of `trimesh`, therefore they work in a similar way.
+- `vedo` has more features; can plot frame axes, arrows, etc.
+
+#### Installation
+I already had `vtk` and `trimesh` installed, so `conda install -c conda-forge vedo` was enough to install.
 
 ### `trimesh` 
 Feature-rich library to work with triangular meshes.  
-- combine meshes
-- check orientaiton of triangles
-- visualzie meshes
-- subdivide meshes   
+- Visualization of meshes is only one application.
+- Can possibly use it to work with the meshes, e.g.,
+    - combine meshes
+    - check orientaiton of triangles
+    - subdivide meshes      
     
 #### Installation
 https://github.com/mikedh/trimesh/
@@ -52,7 +61,7 @@ conda install pyglet	   # 1.5.7
 
 
 ### `mayavi` 
-- Class MeshViewer to visualzie triangulated mesh and velocities, forces
+- Class MeshViewer to visualize triangulated mesh and velocities, forces
 - `mayavi` is a very good tool, but I had problems with Windows installation on my machine.
 
 #### Installation
