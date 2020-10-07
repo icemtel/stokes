@@ -173,7 +173,8 @@ def _average_values(vals, weights=None, n=1, indices_to_skip=None):
 #     return np.array(coords_new), np.array(vectors_new), scale
 
 
-def vector_avg_and_scale(coords, vectors, points_per_arrow, scale=1., min_arrow_length=0., indices_to_skip=None):
+def vector_avg_and_scale(coords, vectors, points_per_arrow, scale=1., min_arrow_length=0., weights=None,
+                         indices_to_skip=None):
     """
     - Returns list of vectors to display
     - Reduces number of vectors by taking averages
@@ -184,7 +185,8 @@ def vector_avg_and_scale(coords, vectors, points_per_arrow, scale=1., min_arrow_
     # Check:
     assert len(coords) == len(vectors)
     coords_avg = np.array(_average_values(coords, weights=None, n=points_per_arrow, indices_to_skip=indices_to_skip))
-    vectors_avg = np.array(_average_values(vectors, weights=None, n=points_per_arrow, indices_to_skip=indices_to_skip))
+    vectors_avg = np.array(
+        _average_values(vectors, weights=weights, n=points_per_arrow, indices_to_skip=indices_to_skip))
     # Scale
     vectors_avg *= scale  # rescale vectors
 
@@ -202,10 +204,14 @@ def vector_avg_and_scale(coords, vectors, points_per_arrow, scale=1., min_arrow_
 def VelocityArrows(path, names, points_per_arrow, scale=1.,
                    c='blue', min_arrow_length=0., group='.', **kwargs):
     '''
-    Averages arrows over several elements =>
+    Averages arrows over several elements:
     - works correctly only if they are located nearby;
-    - Tested only on cilia
-    :param source:
+    - Tested only on cilia; works with most recent implementation;
+    - Coordinate where the arrow starts is the geometrical center of averaged elements
+    - Velocity average is calculated simply as a mean.
+
+    - In more general case: may need some clustering of points
+    :param path: path to hydrodynamic computation results
     :param names:
     :param points_per_arrow:
     :param scale: multiply arrow lengths by scale
@@ -221,17 +227,13 @@ def VelocityArrows(path, names, points_per_arrow, scale=1.,
         # Data
         coords = data_cilium.coordinates
         vels = data_cilium.velocities
-        # forces = data_cilium.forces
-        # areas = data_cilium.areas
-        # sign = +1  # flip forces arrows
-        # force_densities = sign * forces / areas[:, np.newaxis]
 
         #  Velocity Arrows
         coords_avg, vectors_avg = vector_avg_and_scale(coords, vels, points_per_arrow, scale, min_arrow_length)
+        # Create arrows actors
         if len(coords_avg) > 0:
             startPoints = coords_avg
             endPoints = coords_avg + vectors_avg
-
             print(np.amax(np.linalg.norm(vectors_avg, axis=1)))
             arrows = vedo.shapes.Arrows(startPoints, endPoints, c=c, **kwargs)
             to_plot_list.append(arrows)
@@ -239,25 +241,19 @@ def VelocityArrows(path, names, points_per_arrow, scale=1.,
     return arrows_combined
 
 
-# def VelocityArrows(source, names, points_per_arrow, arrow_length_range):
-#     '''
-#     Averages arrows over several elements =>
-#     - works correctly only if they are cocated nearby;
-#     - Tested only on cilia
-#     :param source:
-#     :param names:
-#     :param points_per_arrow:
-#     :param arrow_length_range: min and maximum arrow lengths;
-#     :return: arrow object and scale
-#     '''
-
 def ForceArrows(path, names, points_per_arrow, scale=1.,
                 c='red', min_arrow_length=0., group='.', **kwargs):
     '''
-    Averages arrows over several elements =>
+    Averages arrows over several elements:
     - works correctly only if they are located nearby;
-    - Tested only on cilia
-    :param source:
+    - Tested only on cilia; works with most recent implementation;
+    - Coordinate where the arrow starts is the geometrical center of averaged elements
+    - Force average is calculated as sum of forces on some elements; divided by sum of element areas.
+      (implemented as `sum[(f * A) / A]/sum[A]`)
+
+    - In more general case: may need some clustering of points
+
+    :param path: path to hydrodynamic computation results
     :param names:
     :param points_per_arrow:
     :param scale: multiply arrow lengths by scale
@@ -272,17 +268,20 @@ def ForceArrows(path, names, points_per_arrow, scale=1.,
         data_cilium = source.read_data(name)  # data on the cilium
         # Data
         coords = data_cilium.coordinates
-        forces = data_cilium.forces
-        areas = data_cilium.areas
-        force_densities = forces / areas[:, np.newaxis]
+        forces = data_cilium.forces  # f
+        areas = data_cilium.areas  # A
+        force_densities = forces / areas[:, np.newaxis]  # f * A
 
-        #  Velocity Arrows
-        coords_avg, vectors_avg = vector_avg_and_scale(coords, force_densities,
-                                                              points_per_arrow, scale, min_arrow_length)
-        startPoints = coords_avg
-        endPoints = coords_avg + vectors_avg
+        #  Force arrows
+        # # Will be averaged with weights = areas <=> sum[(f * A) / A]/sum[A]
+        coords_avg, vectors_avg = vector_avg_and_scale(coords, force_densities, weights=areas,
+                                                       points_per_arrow=points_per_arrow,scale=scale,
+                                                       min_arrow_length=min_arrow_length)
 
+        # Create arrows actors
         if len(coords_avg) > 0:
+            startPoints = coords_avg
+            endPoints = coords_avg + vectors_avg
             arrows = vedo.shapes.Arrows(startPoints, endPoints, c=c, **kwargs)
             to_plot_list.append(arrows)
     arrows_combined = vedo.assembly.Assembly(to_plot_list)

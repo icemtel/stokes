@@ -1,9 +1,14 @@
+'''
+- In this example only the flagellum #1 moves
+- Forces on the 2nd one are visibly only if the force scale is increased to `50`
+'''
+
 import mesh
 import mesh.plot.vedo_viewer as mplot
 
 folder = 'data/cilia_plane2/' # cilia_plane'
 
-#mv = mplot.MeshViewer(folder)
+#mv = mplot.MeshViewer(folder) # simple way to display geometry
 phases = [0, 5]
 num_phases = 20
 mv = mplot.FlagellaPlaneViewer(folder, phases=phases, num_phases=num_phases)
