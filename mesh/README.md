@@ -27,12 +27,45 @@ There are different ways to visualize 3D objects in Python: `matplotlib`, `mayav
 - Recommended way: `vedo` or `trimesh`. 
 - examples in `mesh.plot.example`
 
-### `vedo`
+### `vedo` 
+- https://github.com/marcomusy/vedo 
 - `vedo` is built on top of `trimesh`, therefore they work in a similar way.
 - `vedo` has more features; can plot frame axes, arrows, etc.
+- a.k.a. vtkplotter?
+
 
 #### Installation
-I already had `vtk` and `trimesh` installed, so `conda install -c conda-forge vedo` was enough to install.
+
+-  Install via conda
+   ```
+   conda install -c conda-forge vedo
+   ```
+- May need additional packages, but  
+   I already had `vtk` and `trimesh` installed, so nothing extra was required.
+-  For notebooks: install extra?
+    ```
+    conda install -c conda-forge k3d 
+    ```
+   
+#### Problems
+- Embedded in jupyter lab: "Loading widget..."  (already after installation of `k3d`)
+
+#### Usage
+
+- Axes:
+  - 1: scale
+  - 3: large axes
+  - 4: small axes in the corner
+  - Customize: https://github.com/marcomusy/vedo/blob/master/examples/pyplot/customAxes.py
+
+- Successful example on plotting arrows in LAMAS_SPP_code 2020 
+- To avoid crashes - close the plotter
+    ```
+    plotter = m.show(axes=1)
+	plotter.close()
+	```
+
+#### Installation
 
 ### `trimesh` 
 Feature-rich library to work with triangular meshes.  
