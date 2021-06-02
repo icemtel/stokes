@@ -1,9 +1,12 @@
-This is a collection of packages
-- `FBEM`: solve Stokes equation via FBEM
-- `mesh`: creates triangulated mesh for FBEM 
-- `mesh.plot`: visualizations
-- `simulation`: helper code to run lare-scale simulations with multi-threading.
+# Stokes: 
 
+[TODO: visualization of mesh]
+
+This is a collection of packages - see individual README files. [TODO]
+- `FBEM`: solve Stokes equation via a third-party hydrodynamic solver (FMM-BEM [1])
+- `mesh`: creates triangulated mesh for FBEM 
+  - `mesh.plot`: 3D mesh visualizations
+- `simulation`: helper code to run large-scale simulations with multi-threading.
 
 
 
@@ -33,4 +36,5 @@ Usage:
 - see examples in `FBEM/example`
 - For simplicity, the fluid viscosity is always set to 1.
 
-
+[1] Liu 2006... TODO
+[2] Solovev arxiv TODO
