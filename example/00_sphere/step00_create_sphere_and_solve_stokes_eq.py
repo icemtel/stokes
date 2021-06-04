@@ -5,7 +5,7 @@ Solve stokes equation for a moving sphere
 import mesh
 import FBEM
 
-folder = 'data/sphere/'
+output_folder = 'data/sphere/'
 
 position = (0, 0, 0)
 radius = 1
@@ -15,11 +15,12 @@ sphere_grid = 4 # Mesh consisting of 4x4 nodes
 #---
 sphere = mesh.sphere_create('sphere', position, radius, velocity, angular, sphere_grid)
 
-FBEM.run(sphere, folder) # Solve Stokes equation. output is written to a file
+# Run FBEM = solve Stokes eq; write output in the output folder
+FBEM.run(sphere, output_folder)
 
 
 # Read triangulation from file
-coords, trias = FBEM.read_all_triangulation_input(folder + 'input.dat')
+coords, trias = FBEM.read_all_triangulation_input(output_folder + 'input.dat')
 # Alternatively, create triangulation with mesh package
 #tri = mesh.triangulate_system(sphere) # class with coordinates and triangulation (list of triangles)
 # trias = tri.triangulation
