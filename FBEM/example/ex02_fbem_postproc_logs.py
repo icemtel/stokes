@@ -13,11 +13,3 @@ print(res)
 
 
 FBEM.logs.print_failed(folder)
-
-#
-
-folder = 'data/logs_many'
-
-res = FBEM.logs.extract_from_many(folder, max_depth=2)
-
-print(res)
