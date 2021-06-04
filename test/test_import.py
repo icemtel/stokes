@@ -16,10 +16,6 @@ class TestImports(unittest.TestCase):
         import threading
         import queue
 
-
-    def test_mayavi_import(self): # may slow down the test
-        import mayavi.mlab
-
     def test_triangle_import(self):
         '''
         Original: https://github.com/drufat/triangle.git
