@@ -1,5 +1,5 @@
 """
-Visualzie using `vedo` (a.k.a. `vtkplotter`?) package
+Visualzie using `vedo` (a.k.a. `vtkplotter`) package
 
 - I don't define my own MeshViewer class, because vedo.Mesh class is already very functional
 
