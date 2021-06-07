@@ -1,6 +1,6 @@
 # Stokes: create triangulated surface mesh and solve hydrodynamic Stokes equation
 
-![two_cilia.png](../assets/two_cilia.png)
+![two_cilia.png](../assets/two_cilia_small.png)
 
 This is a collection of packages
 - `FBEM`: solve Stokes equation via a third-party hydrodynamic solver (FMM-BEM, Refs. [1,2])
