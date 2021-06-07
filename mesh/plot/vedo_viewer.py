@@ -104,6 +104,7 @@ def FlagellaPlaneViewer(path, phases, num_phases, group='.', cmap='hsv', plane_c
     flagella_mesh = MeshViewer(path, group=group, colors=flagella_colors, names=flagella_names)
 
     plane_mesh = MeshViewer(path, group=group, names=['plane'], colors=[plane_color])
+    plane_mesh.lighting('off')
 
     m_combined = flagella_mesh + plane_mesh
     return m_combined
