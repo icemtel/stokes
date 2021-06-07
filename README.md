@@ -16,7 +16,7 @@ This is a collection of packages
 ## Usage
 
 - see examples in `/example/`
-- See individual subprojects README files and examples.
+- See individual subprojects README files.
 
 ## Authors
 
