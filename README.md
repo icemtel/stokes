@@ -11,7 +11,7 @@ This is a collection of packages
 ## Installation:
 - Use `setup.py` file: `python setup.py develop` to install in developing mode.
 - Copy FBEM executables to `FBEM/exe` folder (see [FBEM README](FBEM/README.md)).
-- additional packages can be installed for 3D mesh visualizaiton (see [mesh README](mesh/README.md))
+- additional packages can be installed for 3D mesh visualizaiton (see [mesh README](mesh/README.md)).
 
 ## Usage
 
