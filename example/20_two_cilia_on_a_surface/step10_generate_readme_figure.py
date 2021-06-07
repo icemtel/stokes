@@ -1,16 +1,15 @@
 '''
-Plot geometry & output forces (exerted by cilia on the fluid) & velocities.
+- Generate plot for the README.md file
 
-Visualizing forces and velocities is tricky:
-We want to average over several nearby points, otherwise we have too many arrows
-Right now, I just average over one-dimensional indices -> works for cilia.
-Applying this code to other geometries may break the averaging
+Cilia phases used: 16, 3
 '''
 import mesh.plot.vedo_viewer as mplot
+import numpy as np
 
-folder = 'data/cilia_presaved/' # pre-saved results of step01
 
-phases = [0, 10] # give manually to paint cilia in correct colors
+folder = 'data/cilia/' # pre-saved results of step01
+
+phases = [16, 3]
 num_phases = 20
 mv = mplot.FlagellaPlaneViewer(folder, phases=phases, num_phases=num_phases)
 # plotter = mv.show()
@@ -28,6 +27,18 @@ scale = - 0.5 # flip sign -> so that does not overlap with velocities
 min_arrow_length = 0.1
 forces = mplot.ForceArrows(folder, names, points_per_arrow=32, scale=scale, min_arrow_length=min_arrow_length)
 
-assembly = mv + velocities  + forces
-plotter = assembly.show()
+assembly = mv + velocities + forces
+
+
+# Camera location
+scale = 2
+z = 14
+r = 30
+psi = np.pi / 6 # polar angle
+camera = dict(pos=scale *  np.array([-r * np.cos(psi), r * np.sin(psi), z]), viewup=[0,0,1], focalPoint=[0,-2 ,0.5])
+size = 128 * np.array([4,3]) # window size
+offscreen = False # Hide
+interactive= True # should be false to execute the whole script
+plotter = assembly.show(camera=camera, pos=(100,0), interactive=interactive,
+                               size=size, offscreen=offscreen)
 plotter.close()
