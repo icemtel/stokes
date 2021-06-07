@@ -1,5 +1,7 @@
 # FBEM 
 
+![two_cilia.png](../assets/two_cilia.png)
+
 A software to solve the Stokes equation with fast-multipole boundary element method.
 
 - Generates input files for a third-party hydrodynamic solver (FMM-BEM [1]).
