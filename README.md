@@ -6,7 +6,7 @@ This is a collection of packages
 - `FBEM`: solve Stokes equation via a third-party hydrodynamic solver (FMM-BEM, Refs. [1,2])
 - `mesh`: creates triangulated mesh for FBEM 
   - `mesh.plot`: 3D mesh visualizations
-- `simulation`: helper code to run large-scale simulations with multi-threading.
+- `simulation_helpers`: helper code to run large-scale simulations with multi-threading.
 
 ## Installation:
 - Use `setup.py` file: `python setup.py develop` to install in developing mode.
