@@ -3,9 +3,8 @@ Updated version:
 Now use tangent and normal vectors in input
 Use them when building the mesh, respecting flagellum material frame
 
-Also take into account rotations of flagellum normals when calculation velocity.
-But only for a case of planar beat!
-
+Also take into account rotations of flagellum normals when calculating the velocities.
+-> Works only for the case of planar beat!
 '''
 
 import numpy as np

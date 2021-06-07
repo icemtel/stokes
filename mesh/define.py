@@ -142,23 +142,35 @@ def disk_create(name, radiusX, width, max_area,
     return wrapped
 
 
-def flagellum_create(name,
-                     positions, future_positions,
-                     radius=0.2,
-                     azimuth_grid=6,
-                     dt=0.1,
-                     translation=(0, 0, 0),
-                     rotation=np.diag([1, 1, 1])):
+def flagellum2_create(name,
+                      points, tangents, normals, radius, azimuth_grid,
+                      points_next=None, tangents_next=None, normals_next=None, dt=None,
+                      translation=(0, 0, 0), rotation=np.diag([1, 1, 1])):
     '''
-    positions: in format zip(xs,ys,zs) - coordinates of points in center line of flagellum
-    future_positions: positions after time dt, so velocities can be prescribed
+    - If no "next" params are given, assume that flagellum is not moving.
+      Otherwise, calculate velocities using finite difference.
+    - v1: did not include tangents, normals;
+        removed on 2021-06-07 [kept in legacy branch]
+
+    :param normals: a list of normals (one for each point) ->
+                   mesh on a circular crossection is generated starting from the direction of that normal.
+                   (makes it easier to compare different shapes)
     '''
-    flagellum_dict = {'type': 'flagellum',
-                      'positions': positions,
-                      'future positions': future_positions,
+    if points_next is None and tangents_next is None and normals_next is None and dt is None:
+        points_next = points
+        tangents_next = tangents
+        normals_next = normals
+        dt = 1
+    flagellum_dict = {'type': 'flagellum2',
+                      'points': points,
+                      'tangents': tangents,
+                      'normals': normals,
+                      'points_next': points_next,
+                      'tangents_next': tangents_next,
+                      'normals_next': normals_next,
+                      'dt': dt,
                       'radius': radius,
-                      'azimuth grid': azimuth_grid,
-                      'dt': dt}
+                      'nTheta': azimuth_grid}
     wrapped = {name: transform(flagellum_dict, translation=translation, rotation=rotation)}
     return wrapped
 
@@ -182,7 +194,6 @@ def flagellum_vel_create(name, points, velocities, tangents, normals, radius, az
 def flagellum_vel_norm_create(name, points, velocities, tangents, normals, normal_velocities, radius, azimuth_grid,
                               translation=(0, 0, 0), rotation=np.diag([1, 1, 1])):
     '''
-    Flagellum "ver 1.8"
     :param normal_velocities: dndt - rate of change of normals; used to calculate velocites.
     CAUTION: Works only for 2D beat pattern
     '''
@@ -198,27 +209,3 @@ def flagellum_vel_norm_create(name, points, velocities, tangents, normals, norma
     return wrapped
 
 
-def flagellum2_create(name,
-                      points, tangents, normals, radius, azimuth_grid,
-                      points_next=None, tangents_next=None, normals_next=None, dt=None,
-                      translation=(0, 0, 0), rotation=np.diag([1, 1, 1])):
-    '''
-    If no "next" params are given, assume that flagellum is not moving.
-    '''
-    if points_next is None and tangents_next is None and normals_next is None and dt is None:
-        points_next = points
-        tangents_next = tangents
-        normals_next = normals
-        dt = 1
-    flagellum_dict = {'type': 'flagellum2',
-                      'points': points,
-                      'tangents': tangents,
-                      'normals': normals,
-                      'points_next': points_next,
-                      'tangents_next': tangents_next,
-                      'normals_next': normals_next,
-                      'dt': dt,
-                      'radius': radius,
-                      'nTheta': azimuth_grid}
-    wrapped = {name: transform(flagellum_dict, translation=translation, rotation=rotation)}
-    return wrapped
