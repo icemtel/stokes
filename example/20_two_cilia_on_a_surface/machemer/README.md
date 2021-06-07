@@ -1,2 +1,0 @@
-- Beat pattern from https://github.com/icemtel/reconstruct3d_opt
-- Original data: Machemer 1972, Naitoh et al. 1984.
