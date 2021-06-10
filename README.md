@@ -25,7 +25,7 @@ This is a collection of Python packages previously used to solve biological hydr
 
 If you want to use this code in a scientific publication, please cite [3].
 
-- [1] [Dr. Yijun Liu webpage](https://www.yijunliu.com/). Package C2 (fast multipole boundary element method for solve the Stokes equation)
+- [1] [Dr. Yijun Liu webpage](https://www.yijunliu.com/). Package C2 (fast multipole boundary element method to solve the Stokes equation)
 - [2] [Liu & Nishimura 2006](https://doi.org/10.1016/j.enganabound.2005.11.006)
 - [3]: [Solovev & Friedrich 2021 EPJ E ST](https://link.springer.com/article/10.1140/epje/s10189-021-00016-x); 
        also available as [arXiv preprint](https://arxiv.org/abs/2010.08111) 
