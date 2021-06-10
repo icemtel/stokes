@@ -2,21 +2,21 @@
 
 ![two_cilia.png](../assets/two_cilia_small.png)
 
-This is a collection of Python packages (previously used to solve biological hydrodynamics problems, see Refs. [3,4])
-- `FBEM`: routines to solve Stokes equation using a third-party hydrodynamic solver (Liu's fast multipole boundary element method FMM-BEM, see Refs. [1,2])
+This is a collection of Python packages previously used to solve biological hydrodynamics problems, see references [3,4] below
+- `FBEM`: routines to solve Stokes equation using a third-party hydrodynamic solver (Liu's fast multipole boundary element method FMM-BEM, see [1,2])
 - `mesh`: routines to be create triangulated meshes to be used as input files for FBEM 
   - `mesh.plot`: routines for 3D mesh visualizations
 - `simulation_helpers`: helpful routines to run large-scale simulations with multi-threading.
 
 ## Installation:
-- Use `setup.py` file: `python setup.py develop` to install in development mode.
+- Use `setup.py` file: run as `python setup.py develop` to install code in development mode.
 - Copy FBEM executables to `FBEM/exe` folder (see [FBEM README](FBEM/README.md)).
-- additional packages can be installed for 3D mesh visualizaiton (see [mesh README](mesh/README.md)).
+- Additional packages can be installed for 3D mesh visualizaiton (see [mesh README](mesh/README.md)).
 
 ## Usage
 
-- please see examples in `/example/` (
-- the folders of the individual subprojects contain additional README files.
+- Please see examples in `/example/`
+- The folders of the individual subprojects contain additional README files.
 
 ## Authors
 
