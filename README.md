@@ -21,6 +21,7 @@ This is a collection of Python packages previously used to solve biological hydr
 ## Authors
 
 - [Anton Solovev](https://github.com/icemtel)
+- Gary Klindt
 - [Benjamin M. Friedrich](https://cfaed.tu-dresden.de/friedrich-home), email: benjamin.m.friedrich@tu-dresden.de
 
 If you want to use this code in a scientific publication, please cite [3].
