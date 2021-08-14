@@ -5,7 +5,7 @@ A software to solve the Stokes equation with fast-multipole boundary element met
 - Generates input files for a third-party hydrodynamic solver (FMM-BEM [1]).
 - Computes velocities from a given surface force distribution. 
   Can solve the inverse and mixed problems (where not all forces are known).
-    - Computing forces from velocities is a backward-problem, where a linear system is solved with GMRES.
+    - Computing forces from velocities is an inverse problem, where a linear system is solved with GMRES.
     - In this code is adapted for the inverse problem.
 - FBEM = fast Boundary Element Method
 

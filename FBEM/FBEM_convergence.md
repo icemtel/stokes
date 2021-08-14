@@ -1,4 +1,4 @@
-These are my technical notes [from 2020-09] on internal parameters of FBEM and how the affect convergence.
+These are my technical notes [from 2020-09] on internal parameters of FBEM and how they affect convergence.
 No warranty. Use them at your own risk!
 
 # Convergence
